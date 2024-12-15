@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import Homepage from './components/Homepage';
 import Login from './components/Login';
 import Register from './components/Register';
 import SandwichList from './components/SandwichList';
 import Cart from './components/Cart';
 import OrderHistory from './components/OrderHistory';
-import AdminPanel from './components/AdminPanel';
 import Profile from './components/Profile';
+import AdminPanel from './components/AdminPanel';
 import FeedbackList from './components/FeedbackList';
 import './App.css';
 
@@ -26,15 +27,22 @@ function App() {
         <Navbar isLoggedIn={isLoggedIn} isAdmin={isAdmin} handleLogout={handleLogout} />
         <main className="main-content">
           <Routes>
-            <Route path="/" element={<Navigate to="/menu" />} />
-            <Route path="/menu" element={<SandwichList />} />
+            <Route path="/" element={<Homepage />} />
+            <Route path="/menu" element={<SandwichList isAdmin={isAdmin} />} />
             <Route
               path="/login"
               element={
-                <Login setIsLoggedIn={setIsLoggedIn} setIsAdmin={setIsAdmin} />
+                isLoggedIn ? (
+                  <Navigate to="/menu" />
+                ) : (
+                  <Login setIsLoggedIn={setIsLoggedIn} setIsAdmin={setIsAdmin} />
+                )
               }
             />
-            <Route path="/register" element={<Register />} />
+            <Route
+              path="/register"
+              element={isLoggedIn ? <Navigate to="/menu" /> : <Register />}
+            />
             <Route
               path="/cart"
               element={isLoggedIn ? <Cart /> : <Navigate to="/login" />}
@@ -48,14 +56,8 @@ function App() {
               element={isLoggedIn ? <Profile /> : <Navigate to="/login" />}
             />
             <Route
-              path="/admin"
-              element={
-                isLoggedIn && isAdmin ? (
-                  <AdminPanel />
-                ) : (
-                  <Navigate to="/" />
-                )
-              }
+              path="/admin/*"
+              element={isLoggedIn && isAdmin ? <AdminPanel /> : <Navigate to="/login" />}
             />
             <Route
               path="/admin/feedback"
